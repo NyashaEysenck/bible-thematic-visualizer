@@ -139,10 +139,10 @@ async def load_themes_database(db):
     return themes_list
 
 async def load_books_database(db):
-    """Loads books from the 'books' collection in MongoDB."""
+    """Loads books from the 'books' collection in MongoDB, ordered by 'id'."""
     collection = db["books"]
     books_list = []
-    for book in collection.find({}, {"_id": 0}):
+    async for book in collection.find({}, {"_id": 0}).sort("id", 1):  # 1 for ascending order
         book["testament"] = book.get("testament", "").lower()
         books_list.append(book)
     return books_list
