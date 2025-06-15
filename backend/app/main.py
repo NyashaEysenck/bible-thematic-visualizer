@@ -121,7 +121,7 @@ async def load_books_database(db):
 
 async def load_book_insights_database(db):
     """Loads book insights from the 'book_insights' collection in MongoDB."""
-    collection = db["book_insights"]
+    collection = db["books"]
     insights = {}
     for doc in collection.find({}, {"_id": 0}):
         if doc.get("id"):
@@ -244,6 +244,7 @@ async def get_book(book_id: int, request: Request):
 async def get_book_insights(book_id: int, request: Request):
     """Get insights for a specific book."""
     insights = request.app.state.DATA["book_insights"].get(str(book_id))
+
     if not insights:
         book = next((b for b in request.app.state.DATA["books"] if b.get("id") == book_id), None)
         if not book:
