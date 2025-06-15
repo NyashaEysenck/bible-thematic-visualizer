@@ -1,4 +1,6 @@
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000/api/v1';
+const API_BASE_URL = import.meta.env.MODE === 'production' 
+  ? '/api/v1'  // Use relative URL in production
+  : 'http://localhost:8000/api/v1';  // Use full URL in development
 
 export const fetchChapters = async (book) => {
   try {
