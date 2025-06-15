@@ -9,6 +9,11 @@ import os
 from pathlib import Path
 from pymongo import MongoClient
 
+from dotenv import load_dotenv
+
+load_dotenv()
+MONGO_DB_URI = os.getenv("MONGO_DB_URI")
+
 # MongoDB connection
 client = None
 db = None
@@ -16,7 +21,7 @@ db = None
 def get_db():
     global client, db
     if client is None:
-        client = MongoClient("")
+        client = MongoClient(MONGO_DB_URI)
         db = client["bible_rag_db"]
     return db
 
