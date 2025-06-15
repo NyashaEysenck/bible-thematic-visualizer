@@ -1,7 +1,8 @@
 from contextlib import asynccontextmanager
 from fastapi import FastAPI, HTTPException, status, Request
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import JSONResponse
+from fastapi.responses import JSONResponse, FileResponse
+from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
 from typing import List, Dict, Optional, Any
 import json
@@ -52,6 +53,21 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+# Static files configuration
+# Check if frontend dist directory exists
+frontend_dist_path = Path("frontend/dist")
+if frontend_dist_path.exists():
+    # Mount static assets (CSS, JS, images, etc.)
+    assets_path = frontend_dist_path / "assets"
+    if assets_path.exists():
+        app.mount("/assets", StaticFiles(directory=str(assets_path)), name="assets")
+    
+    # Mount other static files if they exist
+    for static_dir in ["js", "css", "img", "images", "fonts"]:
+        static_path = frontend_dist_path / static_dir
+        if static_path.exists():
+            app.mount(f"/{static_dir}", StaticFiles(directory=str(static_path)), name=static_dir)
 
 # Data directory path
 DATA_DIR = Path(__file__).parent / "data"
@@ -280,7 +296,7 @@ async def get_book_chapters(book: str):
     """Get all chapters for a specific book from the bible_esv collection."""
     db = get_db()
     collection = db["bible_esv"]
-    
+
     # Aggregate to get chapters with verse counts
     pipeline = [
         {"$match": {"book": book}},
@@ -296,36 +312,55 @@ async def get_book_chapters(book: str):
         }},
         {"$sort": {"number": 1}}
     ]
-    
+
     chapters = list(collection.aggregate(pipeline))
-    
+
     if not chapters:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail=f"No chapters found for book '{book}'"
         )
-    
+
     return chapters
 
 @app.get("/api/v1/books/{book}/chapters/{chapter_number}/verses", response_model=List[VerseInfo])
 async def get_chapter_verses(book: str, chapter_number: int):
-    """Get all verses for a specific chapter from the bible_esv collection."""
     db = get_db()
     collection = db["bible_esv"]
-    
+
     # Find all verses for the specified book and chapter
     verses = list(collection.find(
         {"book": book, "chapter": chapter_number},
         {"_id": 0, "verse": 1, "text": 1, "chapter": 1, "book": 1}
     ).sort("verse", 1))
-    
+
     if not verses:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail=f"No verses found for book '{book}', chapter {chapter_number}"
         )
-    
+
     return verses
+
+# --- Static File Serving for SPA ---
+# This should be the LAST route to catch all non-API routes
+@app.get("/{catchall:path}")
+async def serve_spa(catchall: str):
+    """Serve the React SPA for all non-API routes."""
+    # Don't interfere with API routes
+    if catchall.startswith("api/"):
+        raise HTTPException(status_code=404, detail="API endpoint not found")
+    
+    # Don't interfere with static assets
+    if catchall.startswith(("assets/", "js/", "css/", "img/", "images/", "fonts/")):
+        raise HTTPException(status_code=404, detail="Static file not found")
+    
+    # Serve index.html for all other routes (SPA routing)
+    index_path = Path("frontend/dist/index.html")
+    if index_path.exists():
+        return FileResponse(str(index_path))
+    else:
+        raise HTTPException(status_code=404, detail="Frontend not found")
 
 if __name__ == "__main__":
     import uvicorn
