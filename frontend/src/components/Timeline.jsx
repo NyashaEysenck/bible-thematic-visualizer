@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import ThemeArc from './ThemeArc';
+import BibleReader from './BibleReader';
 import { fetchBooks, fetchThemeConnections } from '../utils/api';
-import { AlertCircle } from 'lucide-react';
+import { AlertCircle, BookOpen, ChevronUp, ChevronDown } from 'lucide-react';
 import '../styles/Timeline.css';
 
 const Timeline = ({ selectedTheme, onBookSelect, selectedBook }) => {
+  const [showBibleReader, setShowBibleReader] = useState(false);
   const [books, setBooks] = useState([]);
   const [connections, setConnections] = useState({});
   const [loading, setLoading] = useState(true);
@@ -130,6 +132,19 @@ const Timeline = ({ selectedTheme, onBookSelect, selectedBook }) => {
 
   return (
     <div className="timeline-container">
+      {selectedBook && (
+        <div className="bible-reader-toggle" onClick={() => setShowBibleReader(!showBibleReader)}>
+          <BookOpen size={16} />
+          <span>{showBibleReader ? 'Hide Bible Reader' : 'Show Bible Reader'}</span>
+          {showBibleReader ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
+        </div>
+      )}
+      
+      {showBibleReader && selectedBook && (
+        <div className="bible-reader-container">
+          <BibleReader book={selectedBook.name} />
+        </div>
+      )}
       <div className="timeline-header">
         <h2>Biblical Timeline</h2>
         <div className="timeline-stats">
@@ -141,7 +156,7 @@ const Timeline = ({ selectedTheme, onBookSelect, selectedBook }) => {
         </div>
       </div>
       
-      <div className="timeline-content">
+      <div className={`timeline-content ${showBibleReader ? 'with-bible-reader' : ''}`}>
         {/* Theme Arc Overlay */}
         {selectedTheme && (
           <ThemeArc 

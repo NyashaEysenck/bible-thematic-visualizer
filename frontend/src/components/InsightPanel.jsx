@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Book, FileText, GraduationCap, BookOpen, ChevronRight, ChevronLeft, AlertCircle } from 'lucide-react';
-import BibleReader from './BibleReader';
+import { Book, FileText, GraduationCap, AlertCircle, ChevronRight, ChevronLeft } from 'lucide-react';
 import { fetchBookInsights, fetchThemeConnections } from '../utils/api';
 import '../styles/InsightPanel.css';
 
@@ -60,8 +59,7 @@ const InsightPanel = ({ selectedBook, selectedTheme }) => {
   const tabs = [
     { id: 'overview', label: 'Book Overview', icon: Book },
     { id: 'scriptures', label: 'Key Scriptures', icon: FileText },
-    { id: 'theology', label: 'Theological Context', icon: GraduationCap },
-    { id: 'read', label: 'Read', icon: BookOpen }
+    { id: 'theology', label: 'Theological Context', icon: GraduationCap }
   ];
 
   if (loading) {
@@ -215,11 +213,7 @@ const InsightPanel = ({ selectedBook, selectedTheme }) => {
                 </div>
               )}
               
-              {activeTab === 'read' && (
-                <div className="bible-reader-container">
-                  <BibleReader book={selectedBook?.name} />
-                </div>
-              )}
+
             </div>
           </>
         )}
