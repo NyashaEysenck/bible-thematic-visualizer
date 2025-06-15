@@ -80,6 +80,18 @@ class BookInsight(BaseModel):
     key_scriptures: List[str]
     theological_context: str
 
+# New models for Bible ESV endpoints
+class ChapterInfo(BaseModel):
+    number: int
+    verseCount: int
+    book: str
+
+class VerseInfo(BaseModel):
+    verse: int
+    text: str
+    chapter: int
+    book: str
+
 # Helper function to load JSON data
 def load_json_file(filename: str) -> Any:
     """Load JSON data from a file."""
@@ -260,6 +272,60 @@ async def get_book_insights(book_id: int, request: Request):
             "theological_context": f"Theological insights for {book.get('name')} would be displayed here."
         }
     return insights
+
+# --- New Bible ESV Endpoints ---
+
+@app.get("/api/v1/books/{book}/chapters", response_model=List[ChapterInfo])
+async def get_book_chapters(book: str):
+    """Get all chapters for a specific book from the bible_esv collection."""
+    db = get_db()
+    collection = db["bible_esv"]
+    
+    # Aggregate to get chapters with verse counts
+    pipeline = [
+        {"$match": {"book": book}},
+        {"$group": {
+            "_id": {"chapter": "$chapter", "book": "$book"},
+            "verseCount": {"$sum": 1}
+        }},
+        {"$project": {
+            "_id": 0,
+            "number": "$_id.chapter",
+            "verseCount": "$verseCount",
+            "book": "$_id.book"
+        }},
+        {"$sort": {"number": 1}}
+    ]
+    
+    chapters = list(collection.aggregate(pipeline))
+    
+    if not chapters:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"No chapters found for book '{book}'"
+        )
+    
+    return chapters
+
+@app.get("/api/v1/books/{book}/chapters/{chapter_number}/verses", response_model=List[VerseInfo])
+async def get_chapter_verses(book: str, chapter_number: int):
+    """Get all verses for a specific chapter from the bible_esv collection."""
+    db = get_db()
+    collection = db["bible_esv"]
+    
+    # Find all verses for the specified book and chapter
+    verses = list(collection.find(
+        {"book": book, "chapter": chapter_number},
+        {"_id": 0, "verse": 1, "text": 1, "chapter": 1, "book": 1}
+    ).sort("verse", 1))
+    
+    if not verses:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"No verses found for book '{book}', chapter {chapter_number}"
+        )
+    
+    return verses
 
 if __name__ == "__main__":
     import uvicorn
