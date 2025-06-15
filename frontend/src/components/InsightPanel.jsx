@@ -209,7 +209,7 @@ const InsightPanel = ({ selectedBook, selectedTheme }) => {
 
               {activeTab === 'theology' && (
                 <div className="theology-content">
-                  {insights?.theologicalContext || 'No theological context available for this book.'}
+                  {insights?.theological_context || 'No theological context available for this book.'}
                 </div>
               )}
               
