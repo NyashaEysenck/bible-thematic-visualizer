@@ -59,7 +59,7 @@ The application consists of two main components:
 
 ### Frontend Setup
 
-1. In a new terminal, navigate to the project root directory.
+1. In a new terminal, navigate to the frontend folder.
 
 2. Install Node.js dependencies:
    ```bash
