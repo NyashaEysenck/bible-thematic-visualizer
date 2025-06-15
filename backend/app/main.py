@@ -16,7 +16,7 @@ db = None
 def get_db():
     global client, db
     if client is None:
-        client = MongoClient("mongodb+srv://ngandah04:GWU7ZE6MgXT6U1KG@cluster0.l8gbypb.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0")
+        client = MongoClient("")
         db = client["bible_rag_db"]
     return db
 
