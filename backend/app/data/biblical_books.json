@@ -1,0 +1,128 @@
+[
+  {
+    "id": 1,
+    "name": "Genesis",
+    "testament": "old",
+    "category": "Law"
+  },
+  {
+    "id": 2,
+    "name": "Exodus",
+    "testament": "old",
+    "category": "Law"
+  },
+  {
+    "id": 3,
+    "name": "Leviticus",
+    "testament": "old",
+    "category": "Law"
+  },
+  {
+    "id": 4,
+    "name": "Numbers",
+    "testament": "old",
+    "category": "Law"
+  },
+  {
+    "id": 5,
+    "name": "Deuteronomy",
+    "testament": "old",
+    "category": "Law"
+  },
+  {
+    "id": 6,
+    "name": "Joshua",
+    "testament": "old",
+    "category": "History"
+  },
+  {
+    "id": 7,
+    "name": "Judges",
+    "testament": "old",
+    "category": "History"
+  },
+  {
+    "id": 8,
+    "name": "Ruth",
+    "testament": "old",
+    "category": "History"
+  },
+  {
+    "id": 9,
+    "name": "1 Samuel",
+    "testament": "old",
+    "category": "History"
+  },
+  {
+    "id": 10,
+    "name": "2 Samuel",
+    "testament": "old",
+    "category": "History"
+  },
+  {
+    "id": 40,
+    "name": "Matthew",
+    "testament": "new",
+    "category": "Gospel"
+  },
+  {
+    "id": 41,
+    "name": "Mark",
+    "testament": "new",
+    "category": "Gospel"
+  },
+  {
+    "id": 42,
+    "name": "Luke",
+    "testament": "new",
+    "category": "Gospel"
+  },
+  {
+    "id": 43,
+    "name": "John",
+    "testament": "new",
+    "category": "Gospel"
+  },
+  {
+    "id": 44,
+    "name": "Acts",
+    "testament": "new",
+    "category": "History"
+  },
+  {
+    "id": 45,
+    "name": "Romans",
+    "testament": "new",
+    "category": "Pauline Epistles"
+  },
+  {
+    "id": 46,
+    "name": "1 Corinthians",
+    "testament": "new",
+    "category": "Pauline Epistles"
+  },
+  {
+    "id": 47,
+    "name": "2 Corinthians",
+    "testament": "new",
+    "category": "Pauline Epistles"
+  },
+  {
+    "id": 48,
+    "name": "Galatians",
+    "testament": "new",
+    "category": "Pauline Epistles"
+  },
+  {
+    "id": 49,
+    "name": "Ephesians",
+    "testament": "new",
+    "category": "Pauline Epistles"
+  },
+  {
+    "id": 66,
+    "name": "Revelation",
+    "testament": "new",
+    "category": "Apocalyptic"
+  }
+]

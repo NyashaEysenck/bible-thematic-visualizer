@@ -1,0 +1,337 @@
+.insight-panel {
+  width: 400px;
+  min-width: 400px;
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  overflow: hidden;
+  position: relative;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.insight-panel.collapsed {
+  width: 60px;
+  min-width: 60px;
+}
+
+.collapse-toggle {
+  position: absolute;
+  top: 50%;
+  left: -15px;
+  transform: translateY(-50%);
+  z-index: 10;
+  width: 30px;
+  height: 30px;
+  background: white;
+  border: 2px solid #e2e8f0;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.collapse-toggle:hover {
+  background: #f8fafc;
+  border-color: #cbd5e1;
+  transform: translateY(-50%) scale(1.1);
+}
+
+.insight-panel-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  overflow: hidden;
+  opacity: 1;
+  transition: opacity 0.3s ease;
+}
+
+.insight-panel.collapsed .insight-panel-content {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.insight-panel-header {
+  padding: 24px;
+  border-bottom: 1px solid #f1f5f9;
+}
+
+.insight-panel-header h2 {
+  font-size: 24px;
+  font-weight: 700;
+  color: #1e293b;
+  margin: 0 0 12px 0;
+}
+
+.book-meta {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+
+.testament-badge {
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.testament-badge.old {
+  background: #dbeafe;
+  color: #1d4ed8;
+}
+
+.testament-badge.new {
+  background: #fef3c7;
+  color: #92400e;
+}
+
+.category-badge {
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 11px;
+  font-weight: 500;
+  background: #f1f5f9;
+  color: #64748b;
+}
+
+.theme-connection {
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-left: 4px solid #3b82f6;
+  border-radius: 8px;
+  padding: 16px;
+  margin-top: 16px;
+}
+
+.connection-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.theme-name {
+  font-weight: 600;
+  font-size: 14px;
+}
+
+.prominence-indicator {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.prominence-indicator span {
+  font-size: 12px;
+  color: #64748b;
+  font-weight: 500;
+}
+
+.prominence-dots {
+  display: flex;
+  gap: 3px;
+}
+
+.prominence-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  transition: all 0.2s ease;
+}
+
+.key-events {
+  font-size: 12px;
+  color: #64748b;
+  line-height: 1.4;
+}
+
+.key-events span {
+  font-weight: 500;
+}
+
+.insight-tabs {
+  display: flex;
+  border-bottom: 1px solid #f1f5f9;
+  background: #f8fafc;
+}
+
+.tab-button {
+  flex: 1;
+  padding: 16px 12px;
+  border: none;
+  background: transparent;
+  font-size: 13px;
+  font-weight: 500;
+  color: #64748b;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  border-bottom: 2px solid transparent;
+}
+
+.tab-button:hover {
+  color: #374151;
+  background: #f1f5f9;
+}
+
+.tab-button.active {
+  color: #3b82f6;
+  background: white;
+  border-bottom-color: #3b82f6;
+}
+
+.insight-content {
+  flex: 1;
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: #cbd5e1 transparent;
+}
+
+.insight-content::-webkit-scrollbar {
+  width: 6px;
+}
+
+.insight-content::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.insight-content::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 3px;
+}
+
+.tab-content {
+  padding: 24px;
+}
+
+.tab-content h4 {
+  font-size: 18px;
+  font-weight: 600;
+  color: #1e293b;
+  margin: 0 0 16px 0;
+}
+
+.tab-content p {
+  font-size: 14px;
+  color: #4b5563;
+  line-height: 1.6;
+  margin: 0;
+}
+
+.scripture-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.scripture-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 16px;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  transition: all 0.2s ease;
+}
+
+.scripture-item:hover {
+  background: #f1f5f9;
+  border-color: #cbd5e1;
+}
+
+.scripture-icon {
+  color: #3b82f6;
+  flex-shrink: 0;
+}
+
+.scripture-reference {
+  font-size: 14px;
+  font-weight: 500;
+  color: #1e293b;
+}
+
+.empty-state {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 48px 24px;
+  text-align: center;
+}
+
+.empty-icon {
+  color: #cbd5e1;
+  margin-bottom: 16px;
+}
+
+.empty-state h3 {
+  font-size: 18px;
+  font-weight: 600;
+  color: #374151;
+  margin: 0 0 8px 0;
+}
+
+.empty-state p {
+  font-size: 14px;
+  color: #6b7280;
+  line-height: 1.5;
+  margin: 0;
+  max-width: 300px;
+}
+
+@media (max-width: 768px) {
+  .insight-panel {
+    width: 100%;
+    min-width: unset;
+    border-radius: 0;
+    height: auto;
+    max-height: 400px;
+  }
+  
+  .insight-panel.collapsed {
+    width: 100%;
+    height: 60px;
+    max-height: 60px;
+  }
+  
+  .collapse-toggle {
+    left: 15px;
+    top: 15px;
+    transform: none;
+  }
+  
+  .insight-panel-header {
+    padding: 16px;
+  }
+  
+  .insight-panel-header h2 {
+    font-size: 20px;
+  }
+  
+  .tab-button {
+    padding: 12px 8px;
+    font-size: 12px;
+  }
+  
+  .tab-content {
+    padding: 16px;
+  }
+  
+  .empty-state {
+    padding: 32px 16px;
+  }
+}

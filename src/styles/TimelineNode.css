@@ -1,0 +1,112 @@
+.timeline-node {
+  position: relative;
+  border-radius: 50%;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  z-index: 10;
+  border: 2px solid;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.timeline-node:hover {
+  transform: scale(1.2);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.timeline-node.old {
+  border-color: #3b82f6;
+}
+
+.timeline-node.new {
+  border-color: #f59e0b;
+}
+
+.timeline-node.connected {
+  z-index: 15;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+  border-width: 3px;
+}
+
+.timeline-node.connected:hover {
+  transform: scale(1.3);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
+}
+
+.timeline-node.selected {
+  z-index: 20;
+  border-width: 4px;
+  transform: scale(1.2);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.25);
+}
+
+.timeline-node.selected:hover {
+  transform: scale(1.4);
+}
+
+.node-pulse {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 100%;
+  height: 100%;
+  border: 2px solid;
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+  animation: pulse 2s infinite;
+  opacity: 0.6;
+}
+
+.node-glow {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 150%;
+  height: 150%;
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+  opacity: 0.2;
+  animation: glow 2s ease-in-out infinite alternate;
+}
+
+@keyframes pulse {
+  0% {
+    transform: translate(-50%, -50%) scale(1);
+    opacity: 0.6;
+  }
+  50% {
+    transform: translate(-50%, -50%) scale(1.5);
+    opacity: 0.3;
+  }
+  100% {
+    transform: translate(-50%, -50%) scale(2);
+    opacity: 0;
+  }
+}
+
+@keyframes glow {
+  from {
+    opacity: 0.2;
+    transform: translate(-50%, -50%) scale(1.5);
+  }
+  to {
+    opacity: 0.4;
+    transform: translate(-50%, -50%) scale(1.8);
+  }
+}
+
+@media (max-width: 768px) {
+  .timeline-node:hover {
+    transform: scale(1.1);
+  }
+  
+  .timeline-node.connected:hover {
+    transform: scale(1.2);
+  }
+  
+  .timeline-node.selected:hover {
+    transform: scale(1.3);
+  }
+}

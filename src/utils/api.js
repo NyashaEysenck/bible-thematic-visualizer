@@ -1,0 +1,56 @@
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000/api/v1';
+
+export const fetchThemes = async () => {
+  try {
+    const response = await fetch(`${API_BASE_URL}/themes`);
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+    return await response.json();
+  } catch (error) {
+    console.error('Error fetching themes:', error);
+    throw error;
+  }
+};
+
+export const fetchBooks = async () => {
+  try {
+    const response = await fetch(`${API_BASE_URL}/books`);
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+    return await response.json();
+  } catch (error) {
+    console.error('Error fetching books:', error);
+    throw error;
+  }
+};
+
+export const fetchThemeConnections = async (themeId) => {
+  try {
+    const response = await fetch(`${API_BASE_URL}/themes/${themeId}/connections`);
+    if (!response.ok) {
+      if (response.status === 404) {
+        return [];
+      }
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+    return await response.json();
+  } catch (error) {
+    console.error(`Error fetching connections for theme ${themeId}:`, error);
+    throw error;
+  }
+};
+
+export const fetchBookInsights = async (bookId) => {
+  try {
+    const response = await fetch(`${API_BASE_URL}/books/${bookId}/insights`);
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+    return await response.json();
+  } catch (error) {
+    console.error(`Error fetching insights for book ${bookId}:`, error);
+    throw error;
+  }
+};
