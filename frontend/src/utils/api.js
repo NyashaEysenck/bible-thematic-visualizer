@@ -1,5 +1,31 @@
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000/api/v1';
 
+export const fetchChapters = async (book) => {
+  try {
+    const response = await fetch(`${API_BASE_URL}/books/${encodeURIComponent(book)}/chapters`);
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+    return await response.json();
+  } catch (error) {
+    console.error(`Error fetching chapters for book ${book}:`, error);
+    throw error;
+  }
+};
+
+export const fetchVerses = async (book, chapterNumber) => {
+  try {
+    const response = await fetch(`${API_BASE_URL}/books/${encodeURIComponent(book)}/chapters/${chapterNumber}/verses`);
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+    return await response.json();
+  } catch (error) {
+    console.error(`Error fetching verses for ${book} ${chapterNumber}:`, error);
+    throw error;
+  }
+};
+
 export const fetchThemes = async () => {
   try {
     const response = await fetch(`${API_BASE_URL}/themes`);

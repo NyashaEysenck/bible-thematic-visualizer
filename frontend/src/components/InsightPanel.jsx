@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { Book, FileText, GraduationCap, ChevronRight, ChevronLeft, AlertCircle } from 'lucide-react';
+import { Book, FileText, GraduationCap, BookOpen, ChevronRight, ChevronLeft, AlertCircle } from 'lucide-react';
+import BibleReader from './BibleReader';
 import { fetchBookInsights, fetchThemeConnections } from '../utils/api';
 import '../styles/InsightPanel.css';
 
@@ -59,7 +60,8 @@ const InsightPanel = ({ selectedBook, selectedTheme }) => {
   const tabs = [
     { id: 'overview', label: 'Book Overview', icon: Book },
     { id: 'scriptures', label: 'Key Scriptures', icon: FileText },
-    { id: 'theology', label: 'Theological Context', icon: GraduationCap }
+    { id: 'theology', label: 'Theological Context', icon: GraduationCap },
+    { id: 'read', label: 'Read', icon: BookOpen }
   ];
 
   if (loading) {
@@ -208,9 +210,14 @@ const InsightPanel = ({ selectedBook, selectedTheme }) => {
               )}
 
               {activeTab === 'theology' && (
-                <div className="tab-content">
-                  <h4>Theological Context</h4>
-                  <p>{insights?.theology || `The theological significance of ${selectedBook.name} within the biblical narrative and doctrinal framework would be explained here.`}</p>
+                <div className="theology-content">
+                  {insights?.theologicalContext || 'No theological context available for this book.'}
+                </div>
+              )}
+              
+              {activeTab === 'read' && (
+                <div className="bible-reader-container">
+                  <BibleReader book={selectedBook?.name} />
                 </div>
               )}
             </div>
