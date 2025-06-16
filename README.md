@@ -4,7 +4,7 @@ A web application for exploring biblical themes across scripture, built with Rea
 
 ## Features
 
-- Browse biblical themes and their connections across scripture
+- Browse biblical themes and their connections across scripture.
 - Interactive timeline showing theme prominence throughout the Bible
 - Detailed insights for each book of the Bible
 - Responsive design that works on desktop and tablet
