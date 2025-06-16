@@ -10,11 +10,17 @@ import os
 from pathlib import Path
 from pymongo import MongoClient
 from datetime import datetime
+import google.generativeai as genai
+import numpy as np
 
 from dotenv import load_dotenv
 
 load_dotenv()
 MONGO_DB_URI = os.getenv("MONGO_DB_URI")
+GOOGLE_API_KEY = os.getenv("GOOGLE_API_KEY")
+
+# Configure Google AI
+genai.configure(api_key=GOOGLE_API_KEY)
 
 # MongoDB connection
 client = None
@@ -26,6 +32,183 @@ def get_db():
         client = MongoClient(MONGO_DB_URI)
         db = client["bible_rag_db"]
     return db
+
+# Vector search helper functions
+async def get_embedding(text: str) -> List[float]:
+    """Generate embedding for text using Google AI."""
+    try:
+        model = "models/text-embedding-004"
+        result = genai.embed_content(model=model, content=text, task_type="retrieval_document")
+        return result['embedding']
+    except Exception as e:
+        print(f"Error generating embedding: {e}")
+        return []
+
+async def vector_search_theology(db, query_embedding: List[float], limit: int = 5) -> List[Dict]:
+    """Perform vector search on theology collection."""
+    try:
+        collection = db["theology"]
+        pipeline = [
+            {
+                "$vectorSearch": {
+                    "index": "vector_index",
+                    "path": "embedding",
+                    "queryVector": query_embedding,
+                    "numCandidates": 20,
+                    "limit": limit
+                }
+            },
+            {
+                "$project": {
+                    "_id": 0,
+                    "concept": 1,
+                    "summary": 1,
+                    "description": 1,
+                    "score": {"$meta": "vectorSearchScore"}
+                }
+            }
+        ]
+        
+        results = list(collection.aggregate(pipeline))
+        return results
+    except Exception as e:
+        print(f"Error in theology vector search: {e}")
+        return []
+
+async def vector_search_commentary(db, query_embedding: List[float], limit: int = 5) -> List[Dict]:
+    """Perform vector search on commentary_chunks collection."""
+    try:
+        collection = db["commentary_chunks"]
+        pipeline = [
+            {
+                "$vectorSearch": {
+                    "index": "vector_index",
+                    "path": "embedding",
+                    "queryVector": query_embedding,
+                    "numCandidates": 20,
+                    "limit": limit
+                }
+            },
+            {
+                "$project": {
+                    "_id": 0,
+                    "text": 1,
+                    "book": 1,
+                    "chapter": 1,
+                    "verse": 1,
+                    "source": 1,
+                    "score": {"$meta": "vectorSearchScore"}
+                }
+            }
+        ]
+        
+        results = list(collection.aggregate(pipeline))
+        return results
+    except Exception as e:
+        print(f"Error in commentary vector search: {e}")
+        return []
+
+async def get_verse_text(db, book: str, chapter: int, verse: int) -> str:
+    """Get the actual verse text from bible_esv collection."""
+    try:
+        collection = db["bible_esv"]
+        verse_doc = collection.find_one({
+            "book": book,
+            "chapter": chapter,
+            "verse": verse
+        })
+        return verse_doc.get("text", "") if verse_doc else ""
+    except Exception as e:
+        print(f"Error getting verse text: {e}")
+        return ""
+
+async def generate_event_explanation(query: str, theology_context: List[Dict], commentary_context: List[Dict], book: str, verse: str, theme: str) -> str:
+    """Generate explanation using Google AI with RAG context."""
+    try:
+        # Prepare theology context
+        theology_text = "\n".join([
+            f"Concept: {item.get('concept', '')}\nSummary: {item.get('summary', '')}\nDescription: {item.get('description', '')}"
+            for item in theology_context
+        ])
+        
+        # Prepare commentary context
+        commentary_text = "\n".join([
+            f"Commentary: {item.get('text', '')}"
+            for item in commentary_context
+        ])
+        
+        prompt = f"""You are a biblical scholar providing detailed explanations of biblical events and their theological significance.
+
+CONTEXT FROM THEOLOGICAL SOURCES:
+{theology_text}
+
+CONTEXT FROM BIBLICAL COMMENTARIES:
+{commentary_text}
+
+QUERY: Explain the biblical event in {book} {verse} as it relates to the theme of {theme}.
+
+Please provide a comprehensive explanation that:
+1. Describes the specific event or passage
+2. Explains its significance within the theme of {theme}
+3. Provides historical and cultural context
+4. Discusses theological implications
+5. Connects it to broader biblical themes and narratives
+
+Keep the explanation scholarly but accessible, approximately 200-300 words."""
+
+        model = genai.GenerativeModel('gemini-1.5-flash')
+        response = model.generate_content(prompt)
+        
+        return response.text if response.text else "Unable to generate explanation at this time."
+        
+    except Exception as e:
+        print(f"Error generating event explanation: {e}")
+        return f"Error generating explanation for {book} {verse} related to {theme}."
+
+async def generate_verse_explanation(verse_text: str, theology_context: List[Dict], commentary_context: List[Dict], book: str, chapter: int, verse: int) -> str:
+    """Generate verse explanation using Google AI with RAG context."""
+    try:
+        # Prepare theology context
+        theology_text = "\n".join([
+            f"Concept: {item.get('concept', '')}\nSummary: {item.get('summary', '')}"
+            for item in theology_context
+        ])
+        
+        # Prepare commentary context
+        commentary_text = "\n".join([
+            f"Commentary: {item.get('text', '')}"
+            for item in commentary_context
+        ])
+        
+        prompt = f"""You are a biblical scholar providing detailed explanations of Bible verses.
+
+VERSE TEXT: "{verse_text}"
+REFERENCE: {book} {chapter}:{verse}
+
+THEOLOGICAL CONTEXT:
+{theology_text}
+
+COMMENTARY CONTEXT:
+{commentary_text}
+
+Please provide a comprehensive explanation of this verse that includes:
+1. The literal meaning and translation insights
+2. Historical and cultural context
+3. Theological significance
+4. How it fits within the broader context of the chapter/book
+5. Practical applications or implications
+6. Connections to other relevant biblical passages
+
+Keep the explanation scholarly but accessible, approximately 200-300 words."""
+
+        model = genai.GenerativeModel('gemini-1.5-flash')
+        response = model.generate_content(prompt)
+        
+        return response.text if response.text else "Unable to generate explanation at this time."
+        
+    except Exception as e:
+        print(f"Error generating verse explanation: {e}")
+        return f"Error generating explanation for {book} {chapter}:{verse}."
 
 # Lifespan handler for FastAPI
 @asynccontextmanager
@@ -63,7 +246,7 @@ if frontend_dist_path.exists():
     assets_path = frontend_dist_path / "assets"
     if assets_path.exists():
         app.mount("/assets", StaticFiles(directory=str(assets_path)), name="assets")
-    
+
     # Mount other static files if they exist
     for static_dir in ["js", "css", "img", "images", "fonts"]:
         static_path = frontend_dist_path / static_dir
@@ -388,10 +571,27 @@ async def explain_event(request: EventExplanationRequest):
             existing_explanation.pop('_id', None)
             return existing_explanation
 
-        # TODO: Implement actual explanation generation using an LLM
-        # For now, we'll return a placeholder
-        explanation = f"Detailed explanation for {request.book} {request.verse} related to the theme of {request.theme}. " \
-                    "This is a placeholder response. In a production environment, this would be generated by an LLM."
+        # Create query for vector search
+        query = f"{request.book} {request.verse} {request.theme}"
+        
+        # Generate embedding for the query
+        query_embedding = await get_embedding(query)
+        
+        if not query_embedding:
+            raise HTTPException(
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                detail="Failed to generate query embedding"
+            )
+
+        # Perform vector searches
+        theology_results = await vector_search_theology(db, query_embedding, limit=3)
+        commentary_results = await vector_search_commentary(db, query_embedding, limit=3)
+
+        # Generate explanation using RAG
+        explanation = await generate_event_explanation(
+            query, theology_results, commentary_results,
+            request.book, request.verse, request.theme
+        )
 
         # Create a new explanation
         new_explanation = {
@@ -403,7 +603,7 @@ async def explain_event(request: EventExplanationRequest):
         }
 
         # Save to database for future use
-        explanations_collection.insert_one(new_explanation)
+        explanations_collection.insert_one(new_explanation.copy())
 
         # Remove MongoDB _id field before returning
         new_explanation.pop('_id', None)
@@ -436,12 +636,35 @@ async def explain_verse(request: VerseExplanationRequest):
             existing_explanation.pop('_id', None)
             return existing_explanation
 
-        # TODO: Implement actual verse explanation generation using an LLM
-        # For now, we'll return a placeholder
-        explanation = (
-            f"Explanation for {request.book} {request.chapter}:{request.verse}. "
-            "This is a placeholder response. In a production environment, this would be "
-            "generated by an LLM with contextual understanding of the verse."
+        # Get the actual verse text
+        verse_text = await get_verse_text(db, request.book, request.chapter, request.verse)
+        
+        if not verse_text:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail=f"Verse not found: {request.book} {request.chapter}:{request.verse}"
+            )
+
+        # Create query for vector search
+        query = f"{request.book} {request.chapter}:{request.verse} {verse_text}"
+        
+        # Generate embedding for the query
+        query_embedding = await get_embedding(query)
+        
+        if not query_embedding:
+            raise HTTPException(
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                detail="Failed to generate query embedding"
+            )
+
+        # Perform vector searches
+        theology_results = await vector_search_theology(db, query_embedding, limit=3)
+        commentary_results = await vector_search_commentary(db, query_embedding, limit=3)
+
+        # Generate explanation using RAG
+        explanation = await generate_verse_explanation(
+            verse_text, theology_results, commentary_results,
+            request.book, request.chapter, request.verse
         )
 
         # Create a new explanation
@@ -454,7 +677,7 @@ async def explain_verse(request: VerseExplanationRequest):
         }
 
         # Save to database for future use
-        verse_explanations.insert_one(new_explanation)
+        verse_explanations.insert_one(new_explanation.copy())
 
         # Remove MongoDB _id field before returning
         new_explanation.pop('_id', None)
@@ -474,11 +697,11 @@ async def serve_spa(catchall: str):
     # Don't interfere with API routes
     if catchall.startswith("api/"):
         raise HTTPException(status_code=404, detail="API endpoint not found")
-    
+
     # Don't interfere with static assets
     if catchall.startswith(("assets/", "js/", "css/", "img/", "images/", "fonts/")):
         raise HTTPException(status_code=404, detail="Static file not found")
-    
+
     # Serve index.html for all other routes (SPA routing)
     index_path = Path("frontend/dist/index.html")
     if index_path.exists():
