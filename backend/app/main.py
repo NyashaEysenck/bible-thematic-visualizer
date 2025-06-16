@@ -367,7 +367,7 @@ async def get_chapter_verses(book: str, chapter_number: int):
 
     return verses
 
-@app.post("/explain-event", response_model=EventExplanationResponse, status_code=status.HTTP_200_OK)
+@app.post("/api/v1/explain-event", response_model=EventExplanationResponse, status_code=status.HTTP_200_OK)
 async def explain_event(request: EventExplanationRequest):
     """
     Generate or retrieve an explanation for a biblical event based on book, verse, and theme.
@@ -415,7 +415,7 @@ async def explain_event(request: EventExplanationRequest):
             detail=f"Failed to generate explanation: {str(e)}"
         )
 
-@app.post("/explain-verse", response_model=VerseExplanationResponse, status_code=status.HTTP_200_OK)
+@app.post("/api/v1/explain-verse", response_model=VerseExplanationResponse, status_code=status.HTTP_200_OK)
 async def explain_verse(request: VerseExplanationRequest):
     """
     Generate or retrieve an explanation for a specific Bible verse.
