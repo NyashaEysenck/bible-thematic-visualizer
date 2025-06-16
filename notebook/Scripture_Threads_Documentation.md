@@ -16,7 +16,7 @@ The Thematic Bible Analysis project creates a sophisticated, AI-powered applicat
 | Source | Description | Format |
 |--------|-------------|--------|
 | **Bible XML** | Complete biblical text dataset | XML (sourced from Kaggle) |
-| **Bible Commentary** | "Unlocking the Bible" by David Pawson | PDF |
+| **Bible Commentary** | Custom scrapped from free web sources | PDF |
 | **Theological Concepts** | Content adapted from the MacArthur Study Bible | Text/JSON |
 
 ## Core Technologies
@@ -46,7 +46,7 @@ The project follows a comprehensive multi-stage pipeline from raw data ingestion
 ### Stage 1: Data Extraction and Structuring 📑
 
 **PDF Processing**
-- Utilizes PyMuPDF library to extract textual content from "Unlocking the Bible" PDF
+- Utilizes PyMuPDF library to extract textual content from "Bible commentary" PDF
 - Processes pages 21-1318 with intelligent content filtering
 - Skips pages with minimal content to ensure data quality
 
@@ -59,7 +59,7 @@ The project follows a comprehensive multi-stage pipeline from raw data ingestion
   - Chapter title
   - Full text content
 
-**Output**: Clean JSON file (`unlockingthebible_chunks.json`) ready for processing
+**Output**: Clean JSON file (`commentary_chunks.json`) ready for processing
 
 ### Stage 2: Data Ingestion and Embedding 🧠
 
