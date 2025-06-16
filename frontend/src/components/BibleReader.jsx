@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { BookOpen, ChevronDown, ChevronUp, Info, X, Loader2 } from 'lucide-react';
+import { BookOpen, ChevronDown, ChevronUp, Info, X, Loader2, RefreshCw } from 'lucide-react';
 import { fetchChapters, fetchVerses, fetchVerseExplanation } from '../utils/api';
 import '../styles/BibleReader.css';
 
@@ -78,7 +78,18 @@ const BibleReader = ({ book }) => {
   }
 
   const handleVerseClick = async (chapterNumber, verseNumber) => {
-    if (!book) return;
+    if (!book) {
+      console.error('No book selected');
+      setExplanationError('No book selected. Please select a book first.');
+      return;
+    }
+    
+    // Don't trigger multiple simultaneous requests for the same verse
+    if (selectedVerse?.chapter === chapterNumber && 
+        selectedVerse?.verse === verseNumber && 
+        (explanationLoading || explanation)) {
+      return;
+    }
     
     setSelectedVerse({ chapter: chapterNumber, verse: verseNumber });
     setExplanationLoading(true);
@@ -86,10 +97,29 @@ const BibleReader = ({ book }) => {
     
     try {
       const response = await fetchVerseExplanation(book, chapterNumber, verseNumber);
+      if (!response || !response.explanation) {
+        throw new Error('Invalid response from server');
+      }
       setExplanation(response.explanation);
     } catch (err) {
       console.error('Failed to fetch explanation:', err);
-      setExplanationError('Failed to load explanation. Please try again.');
+      let errorMessage = 'Failed to load explanation. ';
+      
+      if (err.message.includes('NetworkError') || !navigator.onLine) {
+        errorMessage += 'Please check your internet connection and try again.';
+      } else if (err.response?.status === 404) {
+        errorMessage += 'Verse not found in the database.';
+      } else if (err.response?.status === 500) {
+        errorMessage += 'Server error. Please try again later.';
+      } else if (err.message.includes('Invalid response')) {
+        errorMessage += 'Received an invalid response from the server.';
+      } else {
+        errorMessage += 'Please try again.';
+      }
+      
+      setExplanationError(errorMessage);
+      // Clear the selected verse to allow retry
+      setSelectedVerse(null);
     } finally {
       setExplanationLoading(false);
     }
@@ -147,14 +177,26 @@ const BibleReader = ({ book }) => {
                         <div className="verse-header">
                           <span className="verse-number">{verse.verse}.</span>
                           <button 
-                            className="verse-info-button"
+                            className={`verse-info-button ${explanationLoading && selectedVerse?.chapter === chapter.number && selectedVerse?.verse === verse.verse ? 'loading' : ''}`}
                             onClick={(e) => {
                               e.stopPropagation();
-                              handleVerseClick(chapter.number, verse.verse);
+                              // Only trigger if not already loading
+                              if (!explanationLoading || 
+                                  selectedVerse?.chapter !== chapter.number || 
+                                  selectedVerse?.verse !== verse.verse) {
+                                handleVerseClick(chapter.number, verse.verse);
+                              }
                             }}
-                            aria-label="View explanation"
+                            aria-label={explanationLoading && selectedVerse?.chapter === chapter.number && selectedVerse?.verse === verse.verse 
+                              ? 'Loading explanation...' 
+                              : 'View explanation'}
+                            disabled={explanationLoading && selectedVerse?.chapter === chapter.number && selectedVerse?.verse === verse.verse}
                           >
-                            <Info size={16} />
+                            {explanationLoading && selectedVerse?.chapter === chapter.number && selectedVerse?.verse === verse.verse ? (
+                              <Loader2 className="spinner" size={16} />
+                            ) : (
+                              <Info size={16} />
+                            )}
                           </button>
                         </div>
                         <span className="verse-text">{verse.text}</span>
@@ -188,8 +230,17 @@ const BibleReader = ({ book }) => {
                 </div>
               ) : explanationError ? (
                 <div className="error-message">
-                  <AlertCircle size={16} />
-                  <p>{explanationError}</p>
+                  <AlertCircle size={18} />
+                  <div>
+                    <p>{explanationError}</p>
+                    <button 
+                      className="retry-button"
+                      onClick={() => handleVerseClick(selectedVerse.chapter, selectedVerse.verse)}
+                    >
+                      <RefreshCw size={14} />
+                      Try Again
+                    </button>
+                  </div>
                 </div>
               ) : (
                 <div className="explanation-text" dangerouslySetInnerHTML={{ __html: explanation?.replace(/\n/g, '<br />') }} />

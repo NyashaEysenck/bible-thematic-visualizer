@@ -103,9 +103,12 @@
   align-items: center;
   justify-content: center;
   transition: all 0.2s ease;
+  width: 24px;
+  height: 24px;
+  position: relative;
 }
 
-.verse-info-button:hover {
+.verse-info-button:hover:not(:disabled) {
   color: #63b3ed;
   background: rgba(99, 179, 237, 0.1);
 }
@@ -113,6 +116,16 @@
 .verse-info-button:focus {
   outline: none;
   box-shadow: 0 0 0 2px rgba(99, 179, 237, 0.3);
+}
+
+.verse-info-button:disabled {
+  cursor: not-allowed;
+  opacity: 0.7;
+}
+
+.verse-info-button .spinner {
+  animation: spin 1s linear infinite;
+  color: #63b3ed;
 }
 
 .verse-text {
@@ -212,17 +225,51 @@
 
 .error-message {
   display: flex;
-  align-items: center;
-  gap: 0.5rem;
+  align-items: flex-start;
+  gap: 0.75rem;
   color: #f56565;
   background-color: rgba(245, 101, 101, 0.1);
-  padding: 0.75rem 1rem;
+  padding: 1rem;
   border-radius: 6px;
-  margin: 0;
+  margin: 0 0 1.5rem;
+  border-left: 3px solid #f56565;
+  animation: fadeIn 0.3s ease-out;
+}
+
+.error-message svg {
+  flex-shrink: 0;
+  margin-top: 0.15rem;
 }
 
 .error-message p {
   margin: 0;
+  line-height: 1.5;
+  font-size: 0.95rem;
+}
+
+/* Retry button */
+.retry-button {
+  margin-top: 0.75rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: #e2e8f0;
+  padding: 0.4rem 0.8rem;
+  border-radius: 4px;
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.retry-button:hover {
+  background: rgba(255, 255, 255, 0.15);
+  border-color: rgba(255, 255, 255, 0.3);
+}
+
+.retry-button:active {
+  transform: translateY(1px);
 }
 
 .no-content-message {
