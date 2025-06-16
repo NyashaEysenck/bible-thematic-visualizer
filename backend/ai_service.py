@@ -51,7 +51,7 @@ Please provide a comprehensive explanation that:
 
 Keep the explanation scholarly but accessible, approximately 200-300 words."""
 
-       model = genai.GenerativeModel('gemini-1.5-flash')
+       model = genai.GenerativeModel('gemini-2.0-flash')
        response = model.generate_content(prompt)
        
        return response.text if response.text else "Unable to generate explanation at this time."
@@ -94,7 +94,7 @@ Please provide a comprehensive explanation of this verse that includes:
 
 Keep the explanation scholarly but accessible, approximately 200-300 words."""
 
-       model = genai.GenerativeModel('gemini-1.5-flash')
+       model = genai.GenerativeModel('gemini-2.0-flash')
        response = model.generate_content(prompt)
        
        return response.text if response.text else "Unable to generate explanation at this time."

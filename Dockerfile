@@ -41,4 +41,4 @@ ENV VITE_API_BASE_URL=/api/v1
 EXPOSE 8000
 
 # Command to run the application
-CMD ["uvicorn", "backend.app.main:app", "--host", "0.0.0.0", "--port", "8000"]
+CMD ["uvicorn", "backend.main:app", "--host", "0.0.0.0", "--port", "8000"]
