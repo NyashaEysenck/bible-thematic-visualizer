@@ -26,36 +26,45 @@ async def generate_event_explanation(query: str, theology_context: List[Dict], c
            f"Concept: {item.get('concept', '')}\nSummary: {item.get('summary', '')}\nDescription: {item.get('description', '')}"
            for item in theology_context
        ])
-       
+
        commentary_text = "\n".join([
            f"Commentary: {item.get('text', '')}"
            for item in commentary_context
        ])
-       
-       prompt = f"""You are a biblical scholar providing detailed explanations of biblical events and their theological significance.
 
-CONTEXT FROM THEOLOGICAL SOURCES:
+       prompt = f"""You are a biblical scholar. Your task is to provide a detailed explanation of a biblical event based on the provided context.
+
+**Topic:** The biblical event in {book} {verse} as it relates to the theme of "{theme}".
+
+**Context from Theological Sources:**
 {theology_text}
 
-CONTEXT FROM BIBLICAL COMMENTARIES:
+**Context from Biblical Commentaries:**
 {commentary_text}
 
-QUERY: Explain the biblical event in {book} {verse} as it relates to the theme of {theme}.
+**Instructions:**
+Generate a comprehensive explanation of approximately 200-300 words. The response must be structured with the following headings. Do not use Markdown formatting for the headings, just bold the titles as shown below:
 
-Please provide a comprehensive explanation that:
-1. Describes the specific event or passage
-2. Explains its significance within the theme of {theme}
-3. Provides historical and cultural context
-4. Discusses theological implications
-5. Connects it to broader biblical themes and narratives
+**Event Description:** Briefly describe the specific event or passage.
+**Thematic Connection:** Explain its significance specifically within the theme of "{theme}".
+**Historical and Cultural Context:** Provide relevant historical and cultural background.
+**Theological Implications:** Discuss the key theological takeaways.
+**Broader Biblical Narrative:** Connect the event to broader biblical themes and narratives.
 
-Keep the explanation scholarly but accessible, approximately 200-300 words."""
+Combine these points into a single, cohesive, and scholarly yet accessible explanation.
+"""
 
        model = genai.GenerativeModel('gemini-2.0-flash')
-       response = model.generate_content(prompt)
-       
-       return response.text if response.text else "Unable to generate explanation at this time."
-       
+       response = await model.generate_content_async(prompt)
+
+       if response.text:
+           # Clean the text to remove unwanted markdown characters before returning
+           cleaned_text = response.text.replace('**', '').replace('#', '').strip()
+           return cleaned_text
+       else:
+           return "Unable to generate explanation at this time."
+
+
    except Exception as e:
        print(f"Error generating event explanation: {e}")
        return f"Error generating explanation for {book} {verse} related to {theme}."
@@ -67,39 +76,44 @@ async def generate_verse_explanation(verse_text: str, theology_context: List[Dic
            f"Concept: {item.get('concept', '')}\nSummary: {item.get('summary', '')}"
            for item in theology_context
        ])
-       
+
        commentary_text = "\n".join([
            f"Commentary: {item.get('text', '')}"
            for item in commentary_context
        ])
-       
-       prompt = f"""You are a biblical scholar providing detailed explanations of Bible verses.
 
-VERSE TEXT: "{verse_text}"
-REFERENCE: {book} {chapter}:{verse}
+       prompt = f"""You are a biblical scholar. Your task is to provide a detailed explanation of a Bible verse based on the provided context.
 
-THEOLOGICAL CONTEXT:
+**Verse for Explanation:** "{verse_text}" ({book} {chapter}:{verse})
+
+**Theological Context:**
 {theology_text}
 
-COMMENTARY CONTEXT:
+**Commentary Context:**
 {commentary_text}
 
-Please provide a comprehensive explanation of this verse that includes:
-1. The literal meaning and translation insights
-2. Historical and cultural context
-3. Theological significance
-4. How it fits within the broader context of the chapter/book
-5. Practical applications or implications
-6. Connections to other relevant biblical passages
+**Instructions:**
+Generate a comprehensive explanation of approximately 200-300 words. The response must be structured with the following headings. Do not use Markdown formatting for the headings, just bold the titles as shown below:
 
-Keep the explanation scholarly but accessible, approximately 200-300 words."""
+**Literal Meaning:** Explain the literal meaning and any key translation insights.
+**Historical and Cultural Context:** Describe the relevant historical and cultural background.
+**Theological Significance:** Discuss the primary theological message or implication.
+**Immediate Context:** Explain how the verse fits within the surrounding chapter and book.
+**Practical Application:** Suggest practical applications or implications for the reader.
+
+Combine these points into a single, cohesive, and scholarly yet accessible explanation.
+"""
 
        model = genai.GenerativeModel('gemini-2.0-flash')
-       response = model.generate_content(prompt)
-       
-       return response.text if response.text else "Unable to generate explanation at this time."
-       
+       response = await model.generate_content_async(prompt)
+
+       if response.text:
+           # Clean the text to remove unwanted markdown characters before returning
+           cleaned_text = response.text.replace('**', '').replace('#', '').strip()
+           return cleaned_text
+       else:
+           return "Unable to generate explanation at this time."
+
    except Exception as e:
        print(f"Error generating verse explanation: {e}")
        return f"Error generating explanation for {book} {chapter}:{verse}."
-
