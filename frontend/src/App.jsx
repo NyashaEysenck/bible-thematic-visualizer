@@ -30,18 +30,22 @@ function App() {
       </header>
       
       <main className="app-main">
-        <div className="app-layout">
+        <div className="theme-explorer-container">
           <ThemeExplorer 
             selectedTheme={selectedTheme}
             onThemeSelect={handleThemeSelect}
           />
-          
+        </div>
+        
+        <div className="timeline-container">
           <Timeline 
             selectedTheme={selectedTheme}
             selectedBook={selectedBook}
             onBookSelect={handleBookSelect}
           />
-          
+        </div>
+        
+        <div className="insight-panel-container">
           <InsightPanel 
             selectedBook={selectedBook}
             selectedTheme={selectedTheme}

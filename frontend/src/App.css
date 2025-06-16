@@ -14,11 +14,15 @@ body {
 
 .app {
   min-height: 100vh;
-  display: flex;
-  flex-direction: column;
+  display: grid;
+  grid-template-rows: auto 1fr;
+  grid-template-areas: 
+    "header"
+    "main";
 }
 
 .app-header {
+  grid-area: header;
   background: rgba(255, 255, 255, 0.95);
   backdrop-filter: blur(10px);
   border-bottom: 1px solid rgba(255, 255, 255, 0.2);
@@ -52,19 +56,31 @@ body {
 }
 
 .app-main {
-  flex: 1;
+  grid-area: main;
+  display: grid;
+  grid-template-columns: 320px 1fr 400px;
+  grid-template-areas: "theme-explorer timeline insight-panel";
+  gap: 24px;
   padding: 32px 24px;
   max-width: 1400px;
   margin: 0 auto;
   width: 100%;
+  min-height: 0;
 }
 
-.app-layout {
-  display: flex;
-  gap: 24px;
-  height: calc(100vh - 200px);
-  min-height: 600px;
-  align-items: stretch;
+.theme-explorer-container {
+  grid-area: theme-explorer;
+  min-width: 0;
+}
+
+.timeline-container {
+  grid-area: timeline;
+  min-width: 0;
+}
+
+.insight-panel-container {
+  grid-area: insight-panel;
+  min-width: 0;
 }
 
 /* Smooth scrollbars for better UX */
@@ -97,16 +113,21 @@ input:focus,
 }
 
 /* Responsive design */
-@media (max-width: 1200px) {
-  .app-layout {
-    gap: 16px;
-    height: auto;
-    min-height: unset;
-    flex-direction: column;
-  }
-
+@media (max-width: 1199px) {
   .app-main {
+    grid-template-columns: 1fr;
+    grid-template-areas: 
+      "theme-explorer"
+      "timeline"
+      "insight-panel";
+    gap: 16px;
     padding: 24px 16px;
+  }
+  
+  .theme-explorer-container,
+  .timeline-container,
+  .insight-panel-container {
+    width: 100%;
   }
 }
 
@@ -129,9 +150,6 @@ input:focus,
 
   .app-main {
     padding: 16px;
-  }
-
-  .app-layout {
     gap: 16px;
   }
 }
