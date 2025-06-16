@@ -82,3 +82,51 @@ export const fetchBookInsights = async (bookId) => {
     throw error;
   }
 };
+
+export const fetchEventExplanation = async (book, verse, theme) => {
+  try {
+    const response = await fetch(`${API_BASE_URL}/explain-event`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        book,
+        verse,
+        theme
+      })
+    });
+
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+    return await response.json();
+  } catch (error) {
+    console.error('Error fetching event explanation:', error);
+    throw error;
+  }
+};
+
+export const fetchVerseExplanation = async (book, chapter, verse) => {
+  try {
+    const response = await fetch(`${API_BASE_URL}/explain-verse`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        book,
+        chapter: Number(chapter),
+        verse: Number(verse)
+      })
+    });
+
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+    return await response.json();
+  } catch (error) {
+    console.error('Error fetching verse explanation:', error);
+    throw error;
+  }
+};

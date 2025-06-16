@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { Book, FileText, GraduationCap, AlertCircle, ChevronRight, ChevronLeft } from 'lucide-react';
-import { fetchBookInsights, fetchThemeConnections } from '../utils/api';
+import { Book, FileText, GraduationCap, AlertCircle, ChevronRight, ChevronLeft, X, Loader2 } from 'lucide-react';
+import { fetchBookInsights, fetchThemeConnections, fetchEventExplanation } from '../utils/api';
 import '../styles/InsightPanel.css';
 
 const InsightPanel = ({ selectedBook, selectedTheme }) => {
@@ -10,6 +10,10 @@ const InsightPanel = ({ selectedBook, selectedTheme }) => {
   const [themeConnection, setThemeConnection] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  const [selectedEvent, setSelectedEvent] = useState(null);
+  const [explanation, setExplanation] = useState(null);
+  const [explanationLoading, setExplanationLoading] = useState(false);
+  const [explanationError, setExplanationError] = useState(null);
 
   // Load book insights when selected book changes
   useEffect(() => {
@@ -61,6 +65,34 @@ const InsightPanel = ({ selectedBook, selectedTheme }) => {
     { id: 'scriptures', label: 'Key Scriptures', icon: FileText },
     { id: 'theology', label: 'Theological Context', icon: GraduationCap }
   ];
+
+  const handleEventClick = async (event) => {
+    if (!selectedBook || !selectedTheme) return;
+    
+    setSelectedEvent(event);
+    setExplanationLoading(true);
+    setExplanationError(null);
+    
+    try {
+      const response = await fetchEventExplanation(
+        selectedBook.name,
+        event,
+        selectedTheme.name
+      );
+      setExplanation(response.explanation);
+    } catch (err) {
+      console.error('Failed to fetch explanation:', err);
+      setExplanationError('Failed to load explanation. Please try again.');
+    } finally {
+      setExplanationLoading(false);
+    }
+  };
+
+  const closeExplanation = () => {
+    setSelectedEvent(null);
+    setExplanation(null);
+    setExplanationError(null);
+  };
 
   if (loading) {
     return (
@@ -137,7 +169,22 @@ const InsightPanel = ({ selectedBook, selectedTheme }) => {
                   </div>
                   <div className="key-events">
                     <span>Key Events: </span>
-                    {themeConnection.events.join(', ')}
+                    <div className="event-tags">
+                      {themeConnection.events.map((event, index) => (
+                        <button
+                          key={index}
+                          className={`event-tag ${selectedEvent === event ? 'active' : ''}`}
+                          onClick={() => handleEventClick(event)}
+                          style={{
+                            borderColor: selectedTheme.color,
+                            color: selectedEvent === event ? '#fff' : selectedTheme.color,
+                            backgroundColor: selectedEvent === event ? selectedTheme.color : 'transparent'
+                          }}
+                        >
+                          {event}
+                        </button>
+                      ))}
+                    </div>
                   </div>
                 </div>
               )}
@@ -212,9 +259,42 @@ const InsightPanel = ({ selectedBook, selectedTheme }) => {
                   {insights?.theological_context || 'No theological context available for this book.'}
                 </div>
               )}
-              
-
             </div>
+
+            {/* Event Explanation Modal */}
+            {selectedEvent && (
+              <div className="event-explanation-modal">
+                <div className="event-explanation-content">
+                  <div className="event-explanation-header">
+                    <h3>Event Explanation: {selectedEvent}</h3>
+                    <button className="close-button" onClick={closeExplanation}>
+                      <X size={20} />
+                    </button>
+                  </div>
+                  <div className="event-explanation-body">
+                    {explanationLoading ? (
+                      <div className="loading-container">
+                        <Loader2 className="spinner" size={24} />
+                        <p>Loading explanation...</p>
+                      </div>
+                    ) : explanationError ? (
+                      <div className="error-message">
+                        <AlertCircle size={20} />
+                        <p>{explanationError}</p>
+                      </div>
+                    ) : (
+                      <div className="explanation-text">
+                        {explanation ? (
+                          <p>{explanation}</p>
+                        ) : (
+                          <p>No explanation available for this event.</p>
+                        )}
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </div>
+            )}
           </>
         )}
       </div>
