@@ -15,7 +15,7 @@ The Thematic Bible Analysis project creates a sophisticated, AI-powered applicat
 
 | Source | Description | Format |
 |--------|-------------|--------|
-| **Bible XML** | Complete biblical text dataset | XML (sourced from Kaggle) |
+| **Bible XML** | Complete biblical text dataset | XML (sourced from https://github.com/rwev/bible/tree/master) |
 | **Bible Commentary** | Custom scrapped from free web sources | PDF |
 | **Theological Concepts** | Content adapted from the MacArthur Study Bible | Text/JSON |
 
