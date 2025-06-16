@@ -33,7 +33,7 @@ COPY backend/ ./backend
 COPY --from=frontend-builder /app/frontend/dist ./frontend/dist
 
 # Environment variables
-ENV PYTHONPATH=/app
+ENV PYTHONPATH=/app/backend
 ENV PYTHONUNBUFFERED=1
 ENV VITE_API_BASE_URL=/api/v1
 
