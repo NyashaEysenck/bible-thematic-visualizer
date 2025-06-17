@@ -158,3 +158,5 @@ When the backend is running, you can access the interactive API documentation at
 ## 📄 License
 
 This project is licensed under the MIT License.
+
+<a href="https://bible-thematic-visualizer-539102580650.africa-south1.run.app" target="_blank">🔗 Live Preview</a>
