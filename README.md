@@ -4,6 +4,11 @@ Welcome to **Scripture Threads**, a sophisticated, AI-powered web application de
 
 The system is built on a modern stack, featuring a React (Vite) frontend, a Python (FastAPI) backend, and leverages the powerful synergy between Google's Generative AI and MongoDB's Vector Search capabilities.
 
+
+## 🚀 Live Demo
+
+[🔗 View Live]("https://bible-thematic-visualizer-539102580650.africa-south1.run.app)
+
 ## ✨ Features
 
 ### User Interface & Visualization
@@ -159,4 +164,7 @@ When the backend is running, you can access the interactive API documentation at
 
 This project is licensed under the MIT License.
 
-<a href="https://bible-thematic-visualizer-539102580650.africa-south1.run.app" target="_blank">🔗 Live Preview</a>
+
+
+
+
