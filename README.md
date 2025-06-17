@@ -7,7 +7,7 @@ The system is built on a modern stack, featuring a React (Vite) frontend, a Pyth
 
 ## 🚀 Live Demo
 
-[🔗 View Live]("https://bible-thematic-visualizer-539102580650.africa-south1.run.app)
+[🔗 View Live]("https://bible-thematic-visualizer-539102580650.africa-south1.run.app")
 
 ## ✨ Features
 
